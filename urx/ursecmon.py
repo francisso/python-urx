@@ -241,8 +241,8 @@ class SecondaryMonitor(Thread):
         self._dict = {}
         self._dictLock = Lock()
         self.host = host
-        secondary_port = 30002    # Secondary client interface on Universal Robots
-        self._s_secondary = socket.create_connection((self.host, secondary_port), timeout=0.5)
+        self.secondary_port = 30002    # Secondary client interface on Universal Robots
+        self._s_secondary = socket.create_connection((self.host, self.secondary_port), timeout=0.5)
         self._prog_queue = []
         self._prog_queue_lock = Lock()
         self._dataqueue = bytes()
@@ -286,7 +286,14 @@ class SecondaryMonitor(Thread):
             with self._prog_queue_lock:
                 if len(self._prog_queue) > 0:
                     data = self._prog_queue.pop(0)
-                    self._s_secondary.send(data.program)
+                    try:
+                        self._s_secondary.send(data.program)
+                    except ConnectionError as e:
+                        logging.warning("Exception happened while sending data to ur: " + str(e))
+                        logging.warning("Resetting connection ")
+                        self._s_secondary = socket.create_connection((self.host, self.secondary_port), timeout=0.5)
+                        self._s_secondary.send(data.program)
+
                     with data.condition:
                         data.condition.notify_all()
 
@@ -337,7 +344,13 @@ class SecondaryMonitor(Thread):
                 return ans[0]
             else:
                 # self.logger.debug("Could not find packet in received data")
-                tmp = self._s_secondary.recv(1024)
+                try:
+                    tmp = self._s_secondary.recv(1024)
+                except ConnectionError as e:
+                    logging.warning("Exception happened while recieving data from ur: " + str(e))
+                    logging.warning("Resetting connection ")
+                    self._s_secondary = socket.create_connection((self.host, self.secondary_port), timeout=0.5)
+                    tmp = self._s_secondary.recv(1024)
                 self._dataqueue += tmp
 
     def wait(self, timeout=0.5):

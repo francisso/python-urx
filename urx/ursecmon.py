@@ -283,7 +283,7 @@ class SecondaryMonitor(Thread):
         self._dictLock = Lock()
         self.host = host
         self.secondary_port = 30002  # Secondary client interface on Universal Robots
-        self._s_secondary = socket.create_connection((self.host, self.secondary_port), timeout=0.5)
+        self.reconnect() # connects socket _s_secondary
         self._prog_queue = []
         self._prog_queue_lock = Lock()
         self._dataqueue = bytes()

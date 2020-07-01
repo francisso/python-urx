@@ -266,17 +266,20 @@ class URRobot(object):
         prog = "{}([{},{},{},{},{},{}], a={}, t_min={})".format(command, *vels)
         self.send_program(prog)
 
-    def movej(self, joints, acc=0.1, vel=0.05, wait=True, relative=False, threshold=None):
+    def movej(self, joints, acc=0.1, vel=0.05, wait=True, relative=False, threshold=None,joint_target=True):
         """
         move in joint space
         """
         if relative:
             l = self.getj()
             joints = [v + l[i] for i, v in enumerate(joints)]
-        prog = self._format_move("movej", joints, acc, vel)
+        prefix=''
+        if joint_target==False:
+            prefix='p'
+        prog = self._format_move("movej", joints, acc, vel,prefix=prefix)
         self.send_program(prog)
         if wait:
-            self._wait_for_move(joints[:6], threshold=threshold, joints=True)
+            self._wait_for_move(joints[:6], threshold=threshold, joints=joint_target)
             return self.getj()
 
     def movel(self, tpose, acc=0.01, vel=0.01, wait=True, relative=False, threshold=None):

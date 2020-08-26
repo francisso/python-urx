@@ -12,7 +12,7 @@ urx was primarily developed by [Olivier Roulet-Dubonnet](https://github.com/orou
 
 The easiest is probably to use pip:
 ```
-pip install urx
+pip3 install git+git://github.com/francisso/python-urx
 ```
 
 

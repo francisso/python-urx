@@ -100,7 +100,7 @@ class Robot(URRobot):
         UR robots have several move commands, by default movel is used but it can be changed
         using the command argument
         """
-        self.logger.debug("Setting pose to %s", trans.pose_vector)
+        self.logger.debug("Setting pose to %s", str(trans.pose_vector))
         t = self.csys * trans
         pose = URRobot.movex(self, command, t.pose_vector, acc=acc, vel=vel, wait=wait, threshold=threshold)
         if pose is not None:
@@ -127,7 +127,7 @@ class Robot(URRobot):
         pose = URRobot.getl(self, wait, _log)
         trans = self.csys.inverse * m3d.Transform(pose)
         if _log:
-            self.logger.debug("Returning pose to user: %s", trans.pose_vector)
+            self.logger.debug("Returning pose to user: %s", str(trans.pose_vector))
         return trans
 
     def get_orientation(self, wait=False):

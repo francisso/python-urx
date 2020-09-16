@@ -147,7 +147,7 @@ class URRTMonitor(threading.Thread):
         pkgsize = struct.unpack('>i', head)[0]
         self.logger.debug(
             'Received header telling that package is %s bytes long',
-            pkgsize)
+            str(pkgsize))
         payload = self.__recv_bytes(pkgsize - 4)
         if pkgsize >= 692:
             unp = self.rtstruct692.unpack(payload[:self.rtstruct692.size])
@@ -156,7 +156,7 @@ class URRTMonitor(threading.Thread):
         else:
             self.logger.warning(
                 'Error, Received packet of length smaller than 540: %s ',
-                pkgsize)
+                str(pkgsize))
             return
 
         with self._dataAccess:
@@ -171,7 +171,7 @@ class URRTMonitor(threading.Thread):
                     self._last_ctrl_ts) > 0.010:
                 self.logger.warning(
                     "Error the controller failed to send us a packet: time since last packet %s s ",
-                    self._ctrlTimestamp - self._last_ctrl_ts)
+                    str(self._ctrlTimestamp - self._last_ctrl_ts))
             self._last_ctrl_ts = self._ctrlTimestamp
             self._qActual = np.array(unp[31:37])
             self._qdActual = np.array(unp[37:43])

@@ -168,9 +168,9 @@ class ParserUtils(object):
                     allData["keyMessage"] = self._get_data(pdata, "!iBQbb iiAc", (
                         "size", "type", "timestamp", "source", "robotMessageType", "code", "argument", "messageText"))
                 else:
-                    self.logger.debug("Message type parser not implemented %s", tmp)
+                    self.logger.debug("Message type parser not implemented %s", str(tmp))
             else:
-                self.logger.debug("Unknown packet type %s with size %s", ptype, psize)
+                self.logger.debug("Unknown packet type %s with size %s", str(ptype), str(psize))
 
         return allData
 
@@ -250,20 +250,20 @@ class ParserUtils(object):
                     counter += 1
                     if counter > limit:
                         self.logger.warning(
-                            "tried %s times to find a packet in data, advertised packet size: %s, type: %s", counter,
-                            psize, ptype)
+                            "tried %s times to find a packet in data, advertised packet size: %s, type: %s", str(counter),
+                            str(psize), str(ptype))
                         self.logger.warning("Data length: %s", len(data))
                         limit = limit * 10
                 elif len(data) >= psize:
-                    self.logger.debug("Got packet with size %s and type %s", psize, ptype)
+                    self.logger.debug("Got packet with size %s and type %s", str(psize), str(ptype))
                     if counter:
-                        self.logger.info("Remove %s bytes of garbage at begining of packet", counter)
+                        self.logger.info("Remove %s bytes of garbage at begining of packet", str(counter))
                     # ok we we have somehting which looks like a packet"
                     return (data[:psize], data[psize:])
                 else:
                     # packet is not complete
                     self.logger.debug("Packet is not complete, advertised size is %s, received size is %s, type is %s",
-                                      psize, len(data), ptype)
+                                      str(psize), len(data), str(ptype))
                     return None
             else:
                 # self.logger.debug("data smaller than 5 bytes")
@@ -283,7 +283,7 @@ class SecondaryMonitor(Thread):
         self._dictLock = Lock()
         self.host = host
         self.secondary_port = 30002  # Secondary client interface on Universal Robots
-        self.reconnect() # connects socket _s_secondary
+        self._s_secondary = socket.create_connection((self.host, self.secondary_port), timeout=0.5)
         self._prog_queue = []
         self._prog_queue_lock = Lock()
         self._dataqueue = bytes()
@@ -314,7 +314,7 @@ class SecondaryMonitor(Thread):
         If another program is send while a program is running the first program is aborded.
         """
         prog.strip()
-        self.logger.debug("Enqueueing program: %s", prog)
+        self.logger.debug("Enqueueing program: %s", str(prog))
         if not isinstance(prog, bytes):
             prog = prog.encode()
 
@@ -323,7 +323,7 @@ class SecondaryMonitor(Thread):
             with self._prog_queue_lock:
                 self._prog_queue.append(data)
             data.condition.wait()
-            self.logger.debug("program sendt: %s", data)
+            self.logger.debug("program sendt: %s", str(data))
 
     def run(self):
         """

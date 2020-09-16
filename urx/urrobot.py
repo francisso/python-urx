@@ -83,7 +83,7 @@ class URRobot(object):
         the program is executed immediatly and any runnning
         program is interrupted
         """
-        self.logger.info("Sending program: " + prog)
+        self.logger.info("Sending program: " + str(prog))
         self.secmon.send_program(prog)
 
     def get_tcp_force(self, wait=True):
@@ -206,22 +206,22 @@ class URRobot(object):
         'threshold' we return.
         if threshold is not reached within timeout, an exception is raised
         """
-        self.logger.debug("Waiting for move completion using threshold %s and target %s", threshold, target)
+        self.logger.debug("Waiting for move completion using threshold %s and target %s", str(threshold), str(target))
         start_dist = self._get_dist(target, joints)
         if threshold is None:
             threshold = start_dist * 0.8
             if threshold < 0.001:  # roboten precision is limited
                 threshold = 0.001
-            self.logger.debug("No threshold set, setting it to %s", threshold)
+            self.logger.debug("No threshold set, setting it to %s", str(threshold))
         count = 0
         while True:
             if not self.is_running():
                 raise RobotException("Robot stopped")
             dist = self._get_dist(target, joints)
-            self.logger.debug("distance to target is: %s, target dist is %s", dist, threshold)
+            self.logger.debug("distance to target is: %s, target dist is %s", str(dist), str(threshold))
             if not self.secmon.is_program_running():
                 if dist < threshold:
-                    self.logger.debug("we are threshold(%s) close to target, move has ended", threshold)
+                    self.logger.debug("we are threshold(%s) close to target, move has ended", str(threshold))
                     return
                 count += 1
                 if count > timeout * 10:
@@ -329,7 +329,7 @@ class URRobot(object):
         if pose:
             pose = [pose["X"], pose["Y"], pose["Z"], pose["Rx"], pose["Ry"], pose["Rz"]]
         if _log:
-            self.logger.debug("Received pose from robot: %s", pose)
+            self.logger.debug("Received pose from robot: %s", str(pose))
         return pose
 
     def movec(self, pose_via, pose_to, acc=0.01, vel=0.01, wait=True, threshold=None):
